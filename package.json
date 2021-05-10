@@ -1,0 +1,15 @@
+{
+  "name": "rum-and-coke-machine",
+  "version": "1.0.0",
+  "description": "test",
+  "main": "index.js",
+  "scripts": {},
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.4",
+    "node-gyp": "^3.6.1",
+    "onoff": "^5.0.0",
+    "socket.io": "^2.1.1"
+  }
+}
