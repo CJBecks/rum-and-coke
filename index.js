@@ -11,8 +11,8 @@ const https = require("https");
 //const Gpio = require('onoff').Gpio;
 
 const options = {
-  key: fs.readFileSync("./https/privatekey.pem"),
-  cert: fs.readFileSync("./https/certificate.pem"),
+  key: fs.readFileSync("./https/key.pem"),
+  cert: fs.readFileSync("./https/cert.pem"),
 };
 
 app.use("/", express.static(path.join(__dirname, "stream")));
