@@ -30,6 +30,7 @@ var server = https.createServer(options, app).listen(6969, function () {
 
 var io = require("socket.io")(server);
 var sockets = {};
+var socketFinishedEvent;
 
 io.on("connection", function (socket) {
     sockets[socket.id] = socket;
@@ -54,14 +55,19 @@ io.on("connection", function (socket) {
     socket.on("stop-pour-drink", function () {
         stopPouringDrink();
     });
-});
 
+    socketFinishedEvent = function () {
+        console.log('Call to socketFinishedEvent');
+        socket.emit("finished-drink", {});
+    };
+});
 
 
 function startPouringDrink(drinkStrength) {
     console.log('Call to startPouringDrink', drinkStrength);
 
-    const pumpTimings = determineTimeForEachPump(drinkStrength);
+    const pourTime = 6000; // 6 seconds  = 175ml
+    const pumpTimings = determineTimeForEachPump(drinkStrength, pourTime);
 
     if (pumpTimings.cokeTime > 0) {
         console.log('Starting Coke Pump');
@@ -80,6 +86,10 @@ function startPouringDrink(drinkStrength) {
             stopPump(rumPumpRelay);
         }, pumpTimings.rumTime);
     }
+
+    setTimeout(() => {
+        socketFinishedEvent();
+    }, Math.max(pumpTimings.cokeTime, pumpTimings.rumTime));
 };
 
 function stopPouringDrink() {
@@ -128,8 +138,7 @@ function stopPump(pumpRelay) {
 }
 
 // Strength Level
-function determineTimeForEachPump(drinkStrength) {
-    const timeLength = 6000;
+function determineTimeForEachPump(drinkStrength, timeLength) {
     var cokeTime = 0;
     var rumTime = 0;
 
@@ -156,8 +165,8 @@ function determineTimeForEachPump(drinkStrength) {
             rumTime = (30 / 100) * timeLength;
             break;
         case 6:
-            cokeTime = (60 / 100) * timeLength;
-            rumTime = (40 / 100) * timeLength;
+            cokeTime = (66 / 100) * timeLength;
+            rumTime = (35 / 100) * timeLength;
             break;
         case 7:
             // One shot of rum

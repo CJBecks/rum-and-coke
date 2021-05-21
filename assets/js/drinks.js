@@ -35,6 +35,16 @@ $(document).ready(function () {
     // Enable Strength Range
     $("#drinkStrength").attr("disabled", false);
   });
+
+  // Finished Drink
+  socket.on("finished-drink", function (args) {
+	// Change button
+	$("#stopPouring").addClass("d-none");
+	$("#startPouring").removeClass("d-none");
+
+	// Enable Strength Range
+	$("#drinkStrength").attr("disabled", false);
+  });
 });
 
 function calculateDrinkStrengthLabel(drinkStrength) {
