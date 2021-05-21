@@ -63,19 +63,23 @@ function startPouringDrink(drinkStrength) {
 
     const pumpTimings = determineTimeForEachPump(drinkStrength);
 
-    console.log('Starting Coke Pump');
-    startPump(cokePumpRelay);
-    setTimeout(() => {
-        console.log('Stopping Coke Pump');
-        stopPump(cokePumpRelay);
-    }, pumpTimings.cokeTime);
+    if (pumpTimings.cokeTime > 0) {
+        console.log('Starting Coke Pump');
+        startPump(cokePumpRelay);
+        setTimeout(() => {
+            console.log('Stopping Coke Pump');
+            stopPump(cokePumpRelay);
+        }, pumpTimings.cokeTime);
+    }
 
-    console.log('Starting Rum Pump');
-    startPump(rumPumpRelay);
-    setTimeout(() => {
-        console.log('Stopping Coke Pump');
-        stopPump(rumPumpRelay);
-    }, pumpTimings.rumTime);
+    if (pumpTimings.rumTime > 0) {
+        console.log('Starting Rum Pump');
+        startPump(rumPumpRelay);
+        setTimeout(() => {
+            console.log('Stopping Coke Pump');
+            stopPump(rumPumpRelay);
+        }, pumpTimings.rumTime);
+    }
 };
 
 function stopPouringDrink() {
@@ -125,39 +129,40 @@ function stopPump(pumpRelay) {
 
 // Strength Level
 function determineTimeForEachPump(drinkStrength) {
-    const timeLength = 5000;
+    const timeLength = 6000;
     var cokeTime = 0;
     var rumTime = 0;
 
     switch (drinkStrength) {
         case 1:
+            // Only Coke
             cokeTime = (100 / 100) * timeLength;
             rumTime = (0 / 100) * timeLength;
             break;
         case 2:
-            cokeTime = (95 / 100) * timeLength;
-            rumTime = (5 / 100) * timeLength;
+            cokeTime = (90 / 100) * timeLength;
+            rumTime = (10 / 100) * timeLength;
             break;
         case 3:
-            cokeTime = (85 / 100) * timeLength;
-            rumTime = (15 / 100) * timeLength;
-            break;
-        case 4:
             cokeTime = (80 / 100) * timeLength;
             rumTime = (20 / 100) * timeLength;
             break;
-        case 5:
+        case 4:
             cokeTime = (75 / 100) * timeLength;
-            rumTime = (35 / 100) * timeLength;
+            rumTime = (25 / 100) * timeLength;
             break;
-            break;
-        case 6:
+        case 5:
             cokeTime = (70 / 100) * timeLength;
             rumTime = (30 / 100) * timeLength;
             break;
+        case 6:
+            cokeTime = (60 / 100) * timeLength;
+            rumTime = (40 / 100) * timeLength;
+            break;
         case 7:
-            cokeTime = (65 / 100) * timeLength;
-            rumTime = (35 / 100) * timeLength;
+            // One shot of rum
+            cokeTime = (0 / 100) * timeLength;
+            rumTime = (25 / 100) * timeLength;
             break;
         default:
             // Case 4

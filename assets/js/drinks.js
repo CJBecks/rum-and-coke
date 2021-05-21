@@ -40,7 +40,7 @@ $(document).ready(function () {
 function calculateDrinkStrengthLabel(drinkStrength) {
 	switch (drinkStrength) {
 		case 1:
-			return 'Virgin';
+			return 'Only Coke';
 		case 2:
 			return 'Weaker';
 		case 3:
@@ -52,7 +52,7 @@ function calculateDrinkStrengthLabel(drinkStrength) {
 		case 6:
 			return 'Stronger';
 		case 7:
-			return 'Russian Bull';
+			return 'One Shot of Rum';
 		default:
 			return 'Medium';
 	}
