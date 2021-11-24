@@ -1,5 +1,6 @@
 var express = require("express");
 var app = express();
+const bodyParser = require('body-parser');
 var http = require("http").Server(app);
 var fs = require("fs");
 var path = require("path");
@@ -7,7 +8,10 @@ var proc;
 const https = require("https");
 
 
-// const mcpadc = require('mcp-spi-adc');
+const cokePumpRelay = null;
+const rumPumpRelay = null ;
+
+const mcpadc = require('mcp-spi-adc');
 const Gpio = require('onoff').Gpio;
 const cokePumpRelay = new Gpio(17, 'high'); // IMPORTANT: Use 'high' if relay uses low level trigger
 const rumPumpRelay = new Gpio(18, 'high'); // IMPORTANT: Use 'high' if relay uses low level trigger
@@ -19,6 +23,9 @@ const options = {
 
 app.use("/", express.static(path.join(__dirname, "stream")));
 app.use("/assets", express.static(path.join(__dirname, "assets")));
+
+// Initiate the Body Parser
+app.use(bodyParser.json()); // to support JSON-encoded bodies
 
 app.get("/", function (req, res) {
     res.sendFile(__dirname + "/index.html");
@@ -60,6 +67,12 @@ io.on("connection", function (socket) {
         console.log('Call to socketFinishedEvent');
         socket.emit("finished-drink", {});
     };
+});
+
+app.post('/pour', function (req, res) {
+    console.log('Start Pour', req.body.drinkStrength);
+    startPouringDrink(req.body.drinkStrength);
+    res.json(req.body);
 });
 
 
