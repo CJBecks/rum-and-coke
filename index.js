@@ -1,41 +1,34 @@
-var express = require("express");
-var app = express();
-const bodyParser = require('body-parser');
-var http = require("http").Server(app);
-var fs = require("fs");
-var path = require("path");
-var proc;
-const https = require("https");
+const port = 6969
+const ip = require("ip").address();
+const subdomain = 'rum-and-coke';
 
+const express = require('express')
+const app = express()
+const path = require("path");
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
 
-const cokePumpRelay = null;
-const rumPumpRelay = null ;
+// Create Tunnel
+require('./tunnel')(port, ip, subdomain);
 
-const mcpadc = require('mcp-spi-adc');
-const Gpio = require('onoff').Gpio;
-const cokePumpRelay = new Gpio(17, 'high'); // IMPORTANT: Use 'high' if relay uses low level trigger
-const rumPumpRelay = new Gpio(18, 'high'); // IMPORTANT: Use 'high' if relay uses low level trigger
-
-const options = {
-    key: fs.readFileSync("./https/key.pem"),
-    cert: fs.readFileSync("./https/cert.pem"),
-};
-
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + "/index.html");
+})
 app.use("/", express.static(path.join(__dirname, "stream")));
 app.use("/assets", express.static(path.join(__dirname, "assets")));
 
-// Initiate the Body Parser
-app.use(bodyParser.json()); // to support JSON-encoded bodies
-
-app.get("/", function (req, res) {
-    res.sendFile(__dirname + "/index.html");
+http.listen(port, function () {
+    console.log(`listening on ${ip}:${port}`);
 });
 
-var server = https.createServer(options, app).listen(6969, function () {
-    console.log("listening on *:6969");
-});
 
-var io = require("socket.io")(server);
+const cokePumpRelay = null;
+const rumPumpRelay = null;
+
+const Gpio = require('onoff').Gpio;
+cokePumpRelay = new Gpio(17, 'high'); // IMPORTANT: Use 'high' if relay uses low level trigger
+rumPumpRelay = new Gpio(18, 'high'); // IMPORTANT: Use 'high' if relay uses low level trigger
+
 var sockets = {};
 var socketFinishedEvent;
 
@@ -75,7 +68,6 @@ app.post('/pour', function (req, res) {
     res.json(req.body);
 });
 
-
 function startPouringDrink(drinkStrength) {
     console.log('Call to startPouringDrink', drinkStrength);
 
@@ -109,7 +101,6 @@ function stopPouringDrink() {
     console.log('Call to stopPouringDrink');
     stopPump(cokePumpRelay);
 };
-
 
 // Pump Controls
 function startPump(pumpRelay) {
@@ -193,5 +184,5 @@ function determineTimeForEachPump(drinkStrength, timeLength) {
             break;
     }
 
-    return { cokeTime: cokeTime, rumTime: rumTime};
+    return { cokeTime: cokeTime, rumTime: rumTime };
 }
