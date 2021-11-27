@@ -1,12 +1,13 @@
 const port = 6969
 const ip = require("ip").address();
-const subdomain = 'rum-and-coke';
+const subdomain = 'test-coke';
 
 const express = require('express')
 const app = express()
 const path = require("path");
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
+const bodyParser = require('body-parser');
 
 // Create Tunnel
 require('./tunnel')(port, ip, subdomain);
@@ -16,14 +17,16 @@ app.get('/', (req, res) => {
 })
 app.use("/", express.static(path.join(__dirname, "stream")));
 app.use("/assets", express.static(path.join(__dirname, "assets")));
+// Initiate the Body Parser
+app.use(bodyParser.json()); // to support JSON-encoded bodies
 
 http.listen(port, function () {
     console.log(`listening on ${ip}:${port}`);
 });
 
 
-const cokePumpRelay = null;
-const rumPumpRelay = null;
+var cokePumpRelay = null;
+var rumPumpRelay = null;
 
 const Gpio = require('onoff').Gpio;
 cokePumpRelay = new Gpio(17, 'high'); // IMPORTANT: Use 'high' if relay uses low level trigger
@@ -41,11 +44,6 @@ io.on("connection", function (socket) {
         delete sockets[socket.id];
         console.log("Client Disconnected");
         console.log("Total clients connected : ", Object.keys(sockets).length);
-
-        // no more sockets, kill the stream
-        if (Object.keys(sockets).length == 0) {
-            if (proc) proc.kill();
-        }
     });
 
     socket.on("start-pour-drink", function (data) {
@@ -58,15 +56,17 @@ io.on("connection", function (socket) {
 
     socketFinishedEvent = function () {
         console.log('Call to socketFinishedEvent');
-        socket.emit("finished-drink", {});
+        io.sockets.emit("finished-drink", {});
     };
 });
 
 app.post('/pour', function (req, res) {
     console.log('Start Pour', req.body.drinkStrength);
+    io.sockets.emit("start-drink", req.body.drinkStrength);
     startPouringDrink(req.body.drinkStrength);
     res.json(req.body);
 });
+
 
 function startPouringDrink(drinkStrength) {
     console.log('Call to startPouringDrink', drinkStrength);
@@ -104,6 +104,11 @@ function stopPouringDrink() {
 
 // Pump Controls
 function startPump(pumpRelay) {
+
+    if (!pumpRelay) {
+        return;
+    }
+
     return new Promise((resolve, reject) => {
         pumpRelay.read(async (error, status) => {
             if (error) {
@@ -123,6 +128,11 @@ function startPump(pumpRelay) {
 }
 
 function stopPump(pumpRelay) {
+
+    if (!pumpRelay) {
+        return;
+    }
+
     return new Promise((resolve, reject) => {
         pumpRelay.read(async (error, status) => {
             if (error) {
