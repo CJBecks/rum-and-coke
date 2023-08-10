@@ -1,14 +1,5 @@
-# Motion detection in Javascript
+# Rum and Coke Maching (Raspberry Pi 4)
 
-This is a small example of detecting movement with a webcam in javascript. The core concept is comparing frames to each other and detect differences based on a predetermined sensitivity.
-
-For more information read this blog post: [benjaminhorn.io]
-
-[benjaminhorn.io]:http://benjaminhorn.io/code/motion-detection-with-javascript-and-a-web-camera/
-
-
-
-
-USE pm2 to run it
-
-add shots only section
+Software to run on the Raspberry Pi 4 Rum and Coke Machine*
+- Spin up local website for the user to select which drink they would like
+- Connected to Google Assistant
